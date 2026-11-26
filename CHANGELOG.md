@@ -5,6 +5,13 @@
 
 ## [Unreleased]
 
+### Changed
+
+- README 增加「相关项目与横向对比」：dwproton（改 Wine）、azur-sdk-qt（桥接宿主）、
+  AzurPromilia-SDK-Repair（macOS）与本项目的分层对比、打分与选择建议。
+- 不再发布 PyPI 包：CI 去掉 tag 触发与 publish 作业，`build` 仅验证打包；
+  安装方式改为 `uv tool install git+…`。
+
 ## [0.1.0] - 2026-11-26
 
 ### Added

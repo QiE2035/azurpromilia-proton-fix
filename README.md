@@ -109,19 +109,39 @@ docs/            原理 / 补丁细节 / 排障 / FAQ
 tests/           签名、引擎、CLI 三组用例（不依赖游戏文件）
 ```
 
-## 相关项目（同一问题的其他解法）
+## 相关项目与横向对比
 
-同一个「SDK 窗口在 Wine 下不可见」的问题，别人已经用另外两个层次解过，按介入层从深到浅：
+同一个「SDK 窗口在 Wine 下不可见」的问题，目前有四个解法，介入层从深到浅：
 
-| 项目 | 做法 | 代价 |
-| --- | --- | --- |
-| [suluoMISS/dwproton-11.0-17-azur](https://github.com/suluoMISS/dwproton-11.0-17-azur) | 改 **Wine**（dwproton 11.0-17）：在 `NtUserSetParent` 里把「设父窗口」转成「设 owner」，让分层 ARGB 窗口不被销毁重建；再让这类面板保持 unmanaged，避免被 WM 压回 641×480 | 要重编译 Wine；等上游合入后应切回官方版本 |
-| [puji4810/azur-sdk-qt](https://github.com/puji4810/azur-sdk-qt) | **桥接进程**：另起一个宿主加载官方 Qt SDK，用本机 PyQt6 窗口显示 SDK 画面并转发输入 | 多一层进程与输入转发；依赖 PyQt6；协议/验证仍走官方 CEF |
-| [rakuyoao/AzurPromilia-SDK-Repair](https://github.com/rakuyoao/AzurPromilia-SDK-Repair) | 上一条的 macOS/CrossOver 版本（Swift + AppKit 原生控件） | 仅 macOS |
-| **本项目** | 改 **游戏自带的 `union_pcsdk.dll`** 两条指令：不弹协议门、`SetParent(…, NULL)` 让 SDK 窗口本就是独立顶层窗口 | 不碰 Wine、不加进程；但会改动游戏文件（可一键回滚），且需要按 SDK 版本匹配签名 |
+| 项目 | 改哪里 | 关键手法 | 主要代价 |
+| --- | --- | --- | --- |
+| [suluoMISS/dwproton-11.0-17-azur](https://github.com/suluoMISS/dwproton-11.0-17-azur) | **Wine**（dwproton 11.0-17） | 在 `NtUserSetParent` 里把「设父窗口」转成「设 owner」，让分层 ARGB 的 X window 不被 `destroy_whole_window()` 销毁重建；再让这类 `WS_POPUP+LAYERED+TOOLWINDOW` 面板永远不进入 managed，免得被 WM 按 `WM_NORMAL_HINTS` 压回 641×480 | 两个 `.so` 锁死 Wine 11.0 的 ABI，升级即失效；需等上游合入 |
+| **本项目（apfix）** | 游戏自带的 `union_pcsdk.dll` | 两条字节补丁：NOP 掉协议门的 `jbe`；把 `SetParent(winId, parent)` 的父窗口换成 `NULL`，让 Qt 窗口本来就是顶层窗口 | 改了游戏文件；签名随 SDK 版本要维护 |
+| [puji4810/azur-sdk-qt](https://github.com/puji4810/azur-sdk-qt) | 加一个**桥接宿主进程** | 宿主加载官方 Qt SDK，把画面渲染到本机 PyQt6 窗口并把输入转发回去；官方 CEF 仍在 Proton 里跑 | 多一层进程 + 输入转发；依赖 PyQt6；GPL-3.0 |
+| [rakuyoao/AzurPromilia-SDK-Repair](https://github.com/rakuyoao/AzurPromilia-SDK-Repair) | macOS / CrossOver | 上一条的 Swift + AppKit 原生控件实现（`azur-sdk-qt` 的上游） | 仅 macOS，FineWine 锁 3.1.2 |
 
-三者的目标一致，互斥但不冲突——Wine 修好之后本项目也可以 `apfix revert` 撤掉补丁。如果你更在意「不动游戏文件」，
-优先看 dwproton 那个；如果你连游戏 DLL 都不想改、并且不介意多一个宿主进程，看 azur-sdk-qt。
+### 打分
+
+权重：有效性 30%、侵入性 25%（越不动别人的东西越高分）、维护成本 20%、安装成本 15%、
+被反作弊看到的暴露面 10%。
+
+| 方案 | 有效 | 侵入 | 维护 | 安装 | 暴露 | 加权 |
+| --- | --- | --- | --- | --- | --- | --- |
+| dwproton-azur（改 Wine） | 9 | 10 | 5 | 8 | 10 | **8.55** |
+| azur-sdk-qt（桥接宿主） | 8 | 7 | 9 | 5 | 8 | **7.55** |
+| apfix（本项目，改游戏 DLL） | 9 | 5 | 7 | 10 | 5 | **7.20** |
+| rakuyoao（仅 macOS） | — | 7 | 9 | 3 | 8 | 不参与排名 |
+
+### 怎么选
+
+- **不想碰游戏文件、且就在 dwproton 11.0-17 上** → dwproton-azur。它打在根因上（Wine 的
+  `SetParent` 语义与 Windows 不一致），所有同类 SDK 一起受益，ACE 的完整性检查也看不到变化。
+- **想长期跟着官方 SDK 走、不介意多进程** → azur-sdk-qt。它不吃 Wine 版本也不吃游戏版本，
+  维护成本最低，代价是装机门槛和 GPL。
+- **只想今晚能玩、随时一键撤回** → 本项目。不依赖 Wine 版本，任何 Proton 都能用；
+  代价是动了游戏文件，以及签名需要跟着 SDK 版本维护。
+
+三者互斥但不冲突：Wine 修好之后 `apfix revert` 撤掉补丁即可，反向也成立。
 
 ## 状态
 
