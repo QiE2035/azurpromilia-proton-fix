@@ -24,5 +24,5 @@
   `troubleshooting`、`faq`。
 - 测试：签名匹配、签名失效检测、apply/revert 无损往返、幂等、dry-run、CLI 全流程。
 
-[Unreleased]: https://github.com/QiE2035/azurpromilia-proton-fix/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/QiE2035/azurpromilia-proton-fix/releases/tag/v0.1.0
+[Unreleased]: https://github.com/QiE2035/azurpromilia-proton-fix/commits/main
+[0.1.0]: https://github.com/QiE2035/azurpromilia-proton-fix/commits/main

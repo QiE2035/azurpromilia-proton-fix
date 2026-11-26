@@ -1,7 +1,7 @@
 # apfix — Azur Promilia on Linux (Proton/Wine)
 
 [![CI](https://github.com/QiE2035/apfix/actions/workflows/ci.yml/badge.svg)](https://github.com/QiE2035/apfix/actions/workflows/ci.yml)
-[![PyPI](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 Azur Promilia（蓝色星原：旅谣）在 Linux + Proton 下能跑起来，但会被 `mj_sdk`
@@ -23,11 +23,11 @@ Azur Promilia（蓝色星原：旅谣）在 Linux + Proton 下能跑起来，但
 ## 快速开始
 
 ```bash
-# 1) 安装（uv 最省事，pipx / pip 等价）
-uv tool install apfix
-# 或者从源码（开发模式）
+# 1) 安装：直接从仓库装成工具（本仓库不发 PyPI 包）
+uv tool install git+https://github.com/QiE2035/azurpromilia-proton-fix
+# 或者克隆下来用（开发模式）
 git clone https://github.com/QiE2035/azurpromilia-proton-fix && cd azurpromilia-proton-fix
-uv venv && uv pip install -e . && uv run apfix ...
+uv venv && uv pip install -e . && uv run apfix status --game-dir ~/Games/AzurPromilia/AzurPromilia_Game
 
 # 2) 看一眼现状（只读）
 apfix status --game-dir ~/Games/AzurPromilia/AzurPromilia_Game
