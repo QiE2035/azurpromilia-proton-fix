@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# 补丁产物（不要入库：可能包含游戏文件内容）
+*.apfix-backup
+*.apfix.json
+*.orig
+*.rej
+
+# 游戏文件 / 日志 / 截图（防手滑）
+*.dll
+*.exe
+*.log
+shots/
+screenshots/
+
+# 编辑器
+.idea/
+.vscode/
+*.swp
+.DS_Store

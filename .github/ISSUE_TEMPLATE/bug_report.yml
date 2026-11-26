@@ -1,0 +1,70 @@
+name: 补丁失效 / 启动失败
+description: 游戏更新后补丁打不上，或者打了补丁仍然黑屏 / 没有登录框
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        提交前请先跑 `apfix doctor` 和 `apfix status`。**不要上传游戏文件、DLL 或整份日志**，
+        只贴文本片段即可。
+  - type: input
+    id: game-version
+    attributes:
+      label: 游戏版本
+      description: 启动器里显示的版本，或游戏目录下的版本号目录名（例如 1.0.2.2）
+      placeholder: 1.0.2.2
+    validations:
+      required: true
+  - type: input
+    id: dll-sha
+    attributes:
+      label: union_pcsdk.dll 的 sha256
+      description: "`sha256sum AzurPromilia_Data/Plugins/mj_sdk/union_pcsdk.dll`"
+      placeholder: 939448f9a0a7a47e6f645d20497a454b43000982406a058965652b53a86fc697
+    validations:
+      required: true
+  - type: textarea
+    id: info
+    attributes:
+      label: apfix info 输出
+      description: 完整粘贴（纯文本，不要截图）
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: symptom
+    attributes:
+      label: 现象
+      description: 卡在哪一步？黑屏 / 有背景没登录框 / 登录框点不动 / 进程直接退出
+      render: text
+    validations:
+      required: true
+  - type: dropdown
+    id: patches
+    attributes:
+      label: 当前补丁状态
+      multiple: true
+      options:
+        - skip-agreement-gate applied
+        - detach-overlay-window applied
+        - 两个都是 pending
+        - 出现 mismatch
+    validations:
+      required: true
+  - type: textarea
+    id: env
+    attributes:
+      label: 环境
+      description: 发行版、内核、GPU、Proton/dwproton 版本、桌面环境（X11 / Wayland）
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: 相关日志片段
+      description: "`tail -n 200 pcsdk_log.txt`，以及 Player.log 末尾"
+      render: text
+    validations:
+      required: false

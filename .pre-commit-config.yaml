@@ -1,0 +1,28 @@
+# 本地钩子：https://pre-commit.com
+# 安装：uv tool run pre-commit install
+# 手动全跑：uv tool run pre-commit run --all-files
+default_language_version:
+  python: python3
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: \.md$
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: ["--maxkb=512"]
+      - id: mixed-line-ending
+        args: ["--fix=lf"]
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # 与 pyproject.toml 里的 ruff 规则保持一致；升级时两边一起改
+    rev: v0.17.6
+    hooks:
+      - id: ruff
+        args: ["--fix"]
+      - id: ruff-format

@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 使用问题 / 讨论
+    url: https://github.com/QiE2035/azurpromilia-proton-fix/discussions
+    about: 安装、启动参数、桌面环境差异之类的开放讨论请走 Discussions。
